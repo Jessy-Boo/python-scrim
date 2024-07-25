@@ -27,13 +27,13 @@ def extract_product_info(containers):
         try:
             title_container = container.findAll("a", {"class": "item-title"})
             product_name = title_container[0].text
-
+            
             shipping_container = container.findAll("li", {"class": "price-ship"})
             shipping = shipping_container[0].text.strip().replace(" Shipping", "").replace(" shipping", "")
-
+            
             price_container = container.findAll("li", {"class": "price-current"})
             price = price_container[0].text.strip().split()[0] if price_container else "N/A"
-
+            
             products.append((product_name, shipping, price))
         except Exception as e:
             print(f"Error extracting product info: {e}")
@@ -45,7 +45,7 @@ def save_to_csv(filename, headers, data):
             writer = csv.writer(csvfile)
             writer.writerow(headers)
             writer.writerows(data)
-        print(f"Data saved to {filename}")
+        messagebox.showinfo("Success", f"Data saved to {filename}")
     except Exception as e:
         messagebox.showerror("Error", f"Error saving to CSV: {e}")
 
@@ -68,10 +68,8 @@ def display_results(products):
     for product in products:
         tree.insert("", "end", values=product)
 
-    # Make the column heading to wrap text if necessary
-    for col in tree["columns"]:
-        tree.heading(col, text=tree.heading(col)["text"], anchor="center")
-        tree.column(col, anchor="center")
+    save_button = tk.Button(result_window, text="Save to CSV", command=lambda: save_to_csv("products.csv", ["product_name", "shipping", "price"], products))
+    save_button.pack(pady=10)
 
 def scrape_url():
     url = url_entry.get()
@@ -95,7 +93,7 @@ def main():
     frame = tk.Frame(root, padx=20, pady=20)
     frame.pack(expand=True)
 
-    url_label = tk.Label(frame, text="Enter page URL:", font=("Arial", 12))
+    url_label = tk.Label(frame, text="Enter URL to scrape:", font=("Arial", 12))
     url_label.grid(row=0, column=0, pady=10)
 
     url_entry = tk.Entry(frame, width=50, font=("Arial", 12))
